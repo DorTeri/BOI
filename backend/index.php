@@ -14,10 +14,10 @@ function fetchData($currencyCode)  // Fetching data from BOI to MySQL
     $url = "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_{$currencyCode}_ILS?startperiod=2023-01-01&endperiod=2024-01-01";
     $xmlData = file_get_contents($url);
 
-    if ($xmlData !== false) {
+    if ($xmlData) {
         $xml = simplexml_load_string($xmlData);
 
-        if ($xml !== false) {
+        if ($xml) {
             $dataSet = $xml->xpath('//message:DataSet');
             $json = json_encode($dataSet, JSON_PRETTY_PRINT);
             $obj = json_decode($json)[0];
@@ -25,7 +25,7 @@ function fetchData($currencyCode)  // Fetching data from BOI to MySQL
             $baseCurrency = $obj->Series->{'@attributes'}->BASE_CURRENCY;
             $unitMeasure = $obj->Series->{'@attributes'}->UNIT_MEASURE;
 
-            // Check if table for this currency exists, create if not
+            // Checks if table for this currency exists, creates if not
             $tableName = "rates_$currencyCode";
             $createTableQuery = "CREATE TABLE IF NOT EXISTS $tableName (
                                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,11 +35,11 @@ function fetchData($currencyCode)  // Fetching data from BOI to MySQL
                                 )";
             $conn->query($createTableQuery);
 
-            // Prepare and bind SQL statement for inserting data
-            $stmt = $conn->prepare("INSERT INTO $tableName (base_currency, unit_measure, rates) VALUES (?, ?, ?)");
+            // bind SQL for inserting data
+            $statement = $conn->prepare("INSERT INTO $tableName (base_currency, unit_measure, rates) VALUES (?, ?, ?)");
 
             $rates = array();
-            foreach ($obj->Series->Obs as $observation) {
+            foreach ($obj->Series->Obs as $observation) {  // Creates array of objects as rates
                 $timePeriod = $observation->{'@attributes'}->TIME_PERIOD;
                 $obsValue = $observation->{'@attributes'}->OBS_VALUE;
 
@@ -53,12 +53,11 @@ function fetchData($currencyCode)  // Fetching data from BOI to MySQL
             // Serialize rates array before inserting into the database
             $serializedRates = serialize($rates);
 
-            // Bind parameters and execute the statement
-            $stmt->bind_param("sss", $baseCurrency, $unitMeasure, $serializedRates);
-            $stmt->execute();
+            $statement->bind_param("sss", $baseCurrency, $unitMeasure, $serializedRates);
+            $statement->execute();
 
             // Close the statement
-            $stmt->close();
+            $statement->close();
 
             return "Data inserted for $currencyCode.";
         } else {
@@ -90,6 +89,7 @@ function dataExists($currencyCode) // Checks if there is data already
     return $count > 0;
 }
 
+// Making the fetch for each currency
 $currencies = ['USD', 'EUR', 'GBP'];
 foreach ($currencies as $currency) {
     echo "Currency: $currency\n";

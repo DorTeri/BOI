@@ -1,5 +1,5 @@
 <?php
-require_once('../config/database.php'); // Include database configuration
+require_once('../config/database.php'); // Database configuration
 
 header("Access-Control-Allow-Origin: http://localhost:8080");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -11,14 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['currency']) && isset($_
     $endDate = $_GET['end_date'] ?? '2024-01-01';
 
 
-    // Validate input parameters (e.g., format, data types, etc.)
-
-    // Query the database to retrieve data for the specified currency and time period
+    // Query database
     $tableName = "rates_$currency";
     $query = "SELECT rates FROM $tableName";
-    $stmt = $conn->prepare($query);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $statement = $conn->prepare($query);
+    $statement->execute();
+    $result = $statement->get_result();
 
     // Fetch the data
     $data = [];
@@ -33,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['currency']) && isset($_
     }
 
     // Close the statement
-    $stmt->close();
+    $statement->close();
 
     // Return the data as JSON response
     header('Content-Type: application/json');
