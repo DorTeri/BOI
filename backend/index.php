@@ -3,24 +3,23 @@ require_once('config/database.php'); // Database configuration
 
 function fetchData($currencyCode)  // Fetching data from BOI to MySQL
 {
-    global $conn; 
-    header("Access-Control-Allow-Origin: http://localhost:8080");
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    global $conn;
 
     if (dataExists($currencyCode)) {
-        return "Data already exists for $currencyCode. Skipping fetch and insert.";
+        return "Data already exists for $currencyCode.";
     }
 
     $url = "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_{$currencyCode}_ILS?startperiod=2023-01-01&endperiod=2024-01-01";
     $xmlData = file_get_contents($url);
 
-    if ($xmlData) {
+    if ($xmlData !== false) {
         $xml = simplexml_load_string($xmlData);
 
-        if ($xml) {
+        if ($xml !== null) {
             $dataSet = $xml->xpath('//message:DataSet');
             $json = json_encode($dataSet, JSON_PRETTY_PRINT);
             $obj = json_decode($json)[0];
+
 
             $baseCurrency = $obj->Series->{'@attributes'}->BASE_CURRENCY;
             $unitMeasure = $obj->Series->{'@attributes'}->UNIT_MEASURE;

@@ -48,7 +48,7 @@ export default {
     this.currencies.forEach((currency) => {
       axios
         .get(
-          `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-09-09&end_date=2024-01-01`
+          `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2024-01-01`
         )
         .then((response) => {
           if (typeof response.data === "object") {
@@ -63,6 +63,7 @@ export default {
   methods: {
     getObsValue(currency) {
       const currencyData = this.currencyData[currency];
+      console.log("currencyData", currencyData);
       if (currencyData && currencyData.length > 0) {
         return +currencyData[currencyData.length - 1].obsValue;
       }

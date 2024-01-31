@@ -1,7 +1,8 @@
 <template>
   <section>
+    <notifications position='bottom right'/>
     <AppHeader />
-    <RouterView :isLoading="isLoading"/>
+    <RouterView :isLoading="isLoading" />
   </section>
 </template>
 
@@ -16,14 +17,14 @@ export default {
   data() {
     return {
       isLoading: false,
-    }
+    };
   },
   created() {
-    this.isLoading = true
+    this.isLoading = true;
     fetch("http://localhost/bank/backend/index.php")
       .then((res) => {
-        this.isLoading = false
-        console.log(res)
+        this.isLoading = false;
+        console.log(res);
       })
       .catch((error) => {
         console.error("Error fetching data from backend:", error);

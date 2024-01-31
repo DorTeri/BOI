@@ -44,6 +44,11 @@ export default {
           data: [],
         },
       ],
+      limits: {
+        USD: 3.8,
+        EUR: 4.1,
+        GBP: 4.6,
+      },
     };
   },
   created() {
@@ -54,15 +59,16 @@ export default {
   },
   methods: {
     handleDateChange() {
-      let startFormattedDate = "2023-02-01";
-      let endFormattedDate = "2023-11-11";
+      let startFormattedDate = "2023-01-01";
+      let endFormattedDate = "2024-01-01";
       if (this.date[0] && this.date[1]) {
         startFormattedDate = this.date[0].toISOString().slice(0, 10);
         endFormattedDate = this.date[1].toISOString().slice(0, 10);
       }
       this.fetchData(startFormattedDate, endFormattedDate);
+      this.alert();
     },
-    fetchData(startDate = "2023-02-01", endDate = "2023-11-11") {
+    fetchData(startDate = "2023-01-01", endDate = "2024-01-01") {
       this.series[0].data = [];
       this.options.xaxis.categories = [];
       const currency = this.$route.query.currency;
@@ -75,12 +81,40 @@ export default {
             this.series[0].data.push(data.obsValue);
             this.options.xaxis.categories.push(data.timePeriod);
           });
+          this.alert();
         })
         .catch((error) => {
           console.error(`Error fetching ${currency} data:`, error);
         });
     },
+    alert() {
+      const currency = this.$route.query.currency;
+      const dataLength = this.series[0].data.length;
+      const lastPrice = this.series[0].data[dataLength - 1];
+      console.log('lastPrice', lastPrice)
+      console.log(this.limits[currency])
+      let message = "";
+      let type = "";
+      if (this.limits[currency] > lastPrice) {
+        message = `Good news! the price of ${currency} is lower than usual`;
+        type = "success";
+      } else if (this.limits[currency] < lastPrice) {
+        message = `Bad news! the price of ${currency} is higher than usual`;
+        type = "error";
+      } else {
+        message = `Hey! the price of ${currency} is still the same`;
+        type = "info";
+      }
+      this.$notify({
+        title: `${currency} price alert`,
+        text: message,
+        type,
+      });
+    },
   },
+  // mounted() {
+  //   this.alert();
+  // },
   watch: {
     "$route.query": {
       handler: function (newQuery, oldQuery) {
