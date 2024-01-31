@@ -10,7 +10,7 @@
     </div>
     <div class="nav-items">
       <div class="nav-item" v-for="(item, index) in items" :key="index">
-        <div class="nav-item" @click="handleNavigation(item)">
+        <div class="nav-item" :class="{ active: isItemActive(item) }" @click="handleNavigation(item)">
           {{ item }}
         </div>
       </div>
@@ -33,6 +33,9 @@ export default {
     handleNavigation(currency) {
       this.$router.push({ name: "Stats", query: { currency } });
     },
+    isItemActive(item) {
+      return this.$route.query.currency === item;
+    }
   },
 };
 </script>
@@ -77,5 +80,9 @@ export default {
 
 .logo-text {
   font-weight: 400;
+}
+
+.active {
+  color: rgb(39, 194, 255);
 }
 </style>
