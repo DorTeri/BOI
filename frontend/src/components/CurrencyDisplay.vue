@@ -1,7 +1,6 @@
 <template>
   <div class="currency-display">
     <p>{{ title }}</p>
-    <p>{{ short }}</p>
     <p>{{ value }}</p>
     <p :class="{ positive: isPositive }">{{ diff }}%</p>
   </div>
@@ -18,10 +17,6 @@ export default {
     },
     value: {
       type: Number,
-      required: true,
-    },
-    short: {
-      type: String,
       required: true,
     },
     diff: {

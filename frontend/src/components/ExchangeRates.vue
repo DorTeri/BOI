@@ -9,16 +9,17 @@
         v-for="(currency, index) in currencies"
         :key="index"
       >
-        <CurrencyDisplay
-          @click="handleClick(currency)"
-          v-if="currencyData[currency]"
-          :title="currency"
-          :short="currency"
-          :value="
-            +currencyData[currency][currencyData[currency].length - 1].obsValue
-          "
-          :diff="this.calcDiff(currencyData[currency])"
-        />
+        <div v-if="!isLoading">
+          <CurrencyDisplay
+            @click="handleClick(currency)"
+            :title="currency"
+            :value="getObsValue(currency)"
+            :diff="getDiff(currency)"
+          />
+        </div>
+        <div v-else>
+          <div class="loader">Loading...</div>
+        </div>
       </div>
     </div>
   </section>
@@ -31,6 +32,12 @@ export default {
   components: {
     CurrencyDisplay,
   },
+  props: {
+    isLoading: {
+      type: Boolean,
+      required: false,
+    },
+  },
   data() {
     return {
       currencyData: {},
@@ -38,14 +45,15 @@ export default {
     };
   },
   created() {
-    // Make an HTTP GET request to your backend API for each currency
     this.currencies.forEach((currency) => {
       axios
         .get(
-          `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-09-09&end_date=2023-10-10`
+          `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-09-09&end_date=2024-01-01`
         )
         .then((response) => {
-          this.currencyData[currency] = response.data;
+          if (typeof response.data === "object") {
+            this.currencyData[currency] = response.data;
+          }
         })
         .catch((error) => {
           console.error(`Error fetching ${currency} data:`, error);
@@ -53,21 +61,29 @@ export default {
     });
   },
   methods: {
-    calcDiff(arr) {
-      const length = arr.length;
-      if (length < 2) {
-        return null;
+    getObsValue(currency) {
+      const currencyData = this.currencyData[currency];
+      if (currencyData && currencyData.length > 0) {
+        return +currencyData[currencyData.length - 1].obsValue;
       }
-      const value1 = arr[length - 1].obsValue;
-      const value2 = arr[length - 2].obsValue;
-      const diff = value1 - value2;
-      const percentageDiff = (diff / value2) * 100;
-      const fixed = percentageDiff.toFixed(2);
-      if (fixed < 1) return `-${fixed}`;
-      return `+${fixed}`;
+      return null;
+    },
+    getDiff(currency) {
+      const currencyData = this.currencyData[currency];
+      if (currencyData && currencyData.length > 1) {
+        const length = currencyData.length;
+        const value1 = currencyData[length - 1].obsValue;
+        const value2 = currencyData[length - 2].obsValue;
+        const diff = value1 - value2;
+        const percentageDiff = (diff / value2) * 100;
+        const fixed = percentageDiff.toFixed(2);
+        if (fixed < 1) return `-${fixed}`;
+        return `+${fixed}`;
+      }
+      return null;
     },
     handleClick(currency) {
-      this.$router.push({name: 'Stats', query: { currency}})
+      this.$router.push({ name: "Stats", query: { currency } });
     },
   },
 };
@@ -91,5 +107,4 @@ export default {
   background-color: var(--primary);
   transition: 300ms;
 }
-
 </style>

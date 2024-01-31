@@ -1,7 +1,7 @@
 <template>
   <section>
     <AppHeader />
-    <RouterView />
+    <RouterView :isLoading="isLoading"/>
   </section>
 </template>
 
@@ -13,11 +13,17 @@ export default {
   components: {
     AppHeader,
   },
-
+  data() {
+    return {
+      isLoading: false,
+    }
+  },
   created() {
+    this.isLoading = true
     fetch("http://localhost/bank/backend/index.php")
       .then((res) => {
-        console.log(res);
+        this.isLoading = false
+        console.log(res)
       })
       .catch((error) => {
         console.error("Error fetching data from backend:", error);

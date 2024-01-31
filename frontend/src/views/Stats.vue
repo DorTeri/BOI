@@ -49,16 +49,20 @@ export default {
   created() {
     this.fetchData();
     const startDate = "2023-02-01";
-    const endDate = "2024-01-01";
+    const endDate = "2023-11-11";
     this.date = [startDate, endDate];
   },
   methods: {
     handleDateChange() {
-      const startFormattedDate = this.date[0].toISOString().slice(0, 10);
-      const endFormattedDate = this.date[1].toISOString().slice(0, 10);
+      let startFormattedDate = "2023-02-01";
+      let endFormattedDate = "2023-11-11";
+      if (this.date[0] && this.date[1]) {
+        startFormattedDate = this.date[0].toISOString().slice(0, 10);
+        endFormattedDate = this.date[1].toISOString().slice(0, 10);
+      }
       this.fetchData(startFormattedDate, endFormattedDate);
     },
-    fetchData(startDate = "2023-02-01", endDate = "2024-01-01") {
+    fetchData(startDate = "2023-02-01", endDate = "2023-11-11") {
       this.series[0].data = [];
       this.options.xaxis.categories = [];
       const currency = this.$route.query.currency;

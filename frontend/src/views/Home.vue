@@ -36,7 +36,7 @@
       </div>
     </div>
     <div>
-      <ExchangeRates />
+      <ExchangeRates :isLoading="isLoading" />
     </div>
   </section>
 </template>
@@ -49,6 +49,12 @@ export default {
   components: {
     ExchangeRates,
     DynamicComponent,
+  },
+  props: {
+    isLoading: {
+      type: Boolean,
+      required: false,
+    },
   },
 };
 </script>

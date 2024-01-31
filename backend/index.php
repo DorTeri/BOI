@@ -8,6 +8,7 @@ function fetchData($currencyCode)
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
     if (dataExists($currencyCode)) {
+        echo 'here';
         return "Data already exists for $currencyCode. Skipping fetch and insert.";
     }
 
@@ -69,13 +70,26 @@ function fetchData($currencyCode)
     }
 }
 
-function dataExists($currencyCode) {
+function dataExists($currencyCode)
+{
     global $conn;
     $tableName = "rates_$currencyCode";
-    $checkQuery = "SELECT COUNT(*) AS count FROM $tableName";
-    $result = $conn->query($checkQuery);
+
+    // Check if the table exists
+    $checkTableQuery = "SHOW TABLES LIKE '$tableName'";
+    $result = $conn->query($checkTableQuery);
+    if ($result->num_rows == 0) {
+        // Table doesn't exist, so return false
+        return false;
+    }
+
+    // Table exists, now check if it has any data
+    $checkDataQuery = "SELECT COUNT(*) AS count FROM $tableName";
+    $result = $conn->query($checkDataQuery);
     $row = $result->fetch_assoc();
     $count = $row['count'];
+
+    // Return true if table has data, false otherwise
     return $count > 0;
 }
 
