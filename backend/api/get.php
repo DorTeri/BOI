@@ -23,21 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['currency']) && isset($_
     while ($row = $result->fetch_assoc()) {
         $rates = unserialize($row['rates']);
         foreach ($rates as $rate) {
-            // Assuming each rate object has 'timePeriod' property
             if ($rate->timePeriod >= $startDate && $rate->timePeriod <= $endDate) {
                 $data[] = $rate;
             }
         }
     }
 
-    // Close the statement
     $statement->close();
 
-    // Return the data as JSON response
     header('Content-Type: application/json');
     echo json_encode($data);
 } else {
-    // Handle invalid requests
-    http_response_code(400); // Bad request
+    http_response_code(400);
     echo json_encode(array("message" => "Invalid request"));
 }
