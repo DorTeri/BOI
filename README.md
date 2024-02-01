@@ -13,7 +13,7 @@ Follow these steps to get the project up and running on your local machine:
 
 ### Installation
 
-1. **Clone the repository**:
+1. **Clone the repository to htdocs in XAMPP folder**:
 
     ```bash
     git clone https://github.com/DorTeri/BOI.git
