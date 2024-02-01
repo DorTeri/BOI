@@ -45,22 +45,25 @@ export default {
     };
   },
   created() {
-    this.currencies.forEach((currency) => {
-      axios
-        .get(
-          `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2024-01-01`
-        )
-        .then((response) => {
-          if (typeof response.data === "object") {
-            this.currencyData[currency] = response.data;
-          }
-        })
-        .catch((error) => {
-          console.error(`Error fetching ${currency} data:`, error);
-        });
-    });
+    this.fetchCurrencyData();
   },
   methods: {
+    fetchCurrencyData() {
+      this.currencies.forEach((currency) => {
+        axios
+          .get(
+            `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2024-01-01`
+          )
+          .then((response) => {
+            if (typeof response.data === "object") {
+              this.currencyData[currency] = response.data;
+            }
+          })
+          .catch((error) => {
+            console.error(`Error fetching ${currency} data:`, error);
+          });
+      });
+    },
     getObsValue(currency) {
       const currencyData = this.currencyData[currency];
       console.log("currencyData", currencyData);
@@ -86,6 +89,13 @@ export default {
     handleClick(currency) {
       this.$router.push({ name: "Stats", query: { currency } });
     },
+  },
+  watch: {
+    isLoading(newValue) {
+      if (!newValue) {
+        this.fetchCurrencyData();
+      }
+    }
   },
 };
 </script>
