@@ -16,7 +16,7 @@ Follow these steps to get the project up and running on your local machine:
 1. **Clone the repository to htdocs in XAMPP folder**:
 
     ```bash
-    git clone https://github.com/DorTeri/BOI.git
+    git clone https://github.com/DorTeri/bank.git
     ```
 
 2. **Navigate to the frontend directory**:
