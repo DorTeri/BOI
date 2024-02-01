@@ -91,8 +91,6 @@ export default {
       const currency = this.$route.query.currency;
       const dataLength = this.series[0].data.length;
       const lastPrice = this.series[0].data[dataLength - 1];
-      console.log('lastPrice', lastPrice)
-      console.log(this.limits[currency])
       let message = "";
       let type = "";
       if (this.limits[currency] > lastPrice) {
@@ -112,9 +110,6 @@ export default {
       });
     },
   },
-  // mounted() {
-  //   this.alert();
-  // },
   watch: {
     "$route.query": {
       handler: function (newQuery, oldQuery) {

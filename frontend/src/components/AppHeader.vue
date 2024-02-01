@@ -10,7 +10,11 @@
     </div>
     <div class="nav-items">
       <div class="nav-item" v-for="(item, index) in items" :key="index">
-        <div class="nav-item" :class="{ active: isItemActive(item) }" @click="handleNavigation(item)">
+        <div
+          class="nav-item"
+          :class="{ active: isItemActive(item) }"
+          @click="handleNavigation(item)"
+        >
           {{ item }}
         </div>
       </div>
@@ -26,16 +30,29 @@ export default {
       items: ["USD", "EUR", "GBP"],
     };
   },
+  props: {
+    isLoading: {
+      type: Boolean,
+    },
+  },
   methods: {
     handleLogoClick() {
       this.$router.push({ name: "Home" });
     },
     handleNavigation(currency) {
-      this.$router.push({ name: "Stats", query: { currency } });
+      if (this.isLoading) {
+        this.$notify({
+          title: `Info`,
+          text: 'Data is still loading',
+          type: 'info',
+        });
+      } else {
+        this.$router.push({ name: "Stats", query: { currency } });
+      }
     },
     isItemActive(item) {
       return this.$route.query.currency === item;
-    }
+    },
   },
 };
 </script>

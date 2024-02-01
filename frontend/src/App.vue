@@ -1,7 +1,7 @@
 <template>
   <section>
-    <notifications position='bottom right'/>
-    <AppHeader />
+    <notifications position='top right'/>
+    <AppHeader :isLoading="isLoading"/>
     <RouterView :isLoading="isLoading" />
   </section>
 </template>
