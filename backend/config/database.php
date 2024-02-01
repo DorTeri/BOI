@@ -3,8 +3,8 @@ header("Access-Control-Allow-Origin: http://localhost:8080");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'dor');
-define('DB_PASS', '123456');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 
 // Create connection
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
