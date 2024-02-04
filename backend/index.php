@@ -5,7 +5,7 @@ require_once('./api/get.php');
 function fetchData($currencyCode)  // Fetching data from BOI to MySQL
 {
     checkIfTableExists($currencyCode);
-    $url = "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_{$currencyCode}_ILS?startperiod=2023-01-01&endperiod=2024-01-01";
+    $url = "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_{$currencyCode}_ILS?startperiod=2023-01-01&endperiod=2025-01-01";
     $xmlData = file_get_contents($url);
 
 

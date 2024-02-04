@@ -68,7 +68,7 @@ export default {
       this.fetchData(startFormattedDate, endFormattedDate);
       this.alert();
     },
-    fetchData(startDate = "2023-01-01", endDate = "2024-01-01") {
+    fetchData(startDate = "2023-05-01", endDate = "2024-05-01") {
       this.series[0].data = [];
       this.options.xaxis.categories = [];
       const currency = this.$route.query.currency;

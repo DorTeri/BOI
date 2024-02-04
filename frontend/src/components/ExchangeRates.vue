@@ -52,7 +52,7 @@ export default {
       this.currencies.forEach((currency) => {
         axios
           .get(
-            `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2024-01-01`
+            `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2025-01-01`
           )
           .then((response) => {
             console.log('test', response.data)
