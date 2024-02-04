@@ -4,7 +4,7 @@ require_once('./api/get.php');
 
 function fetchData($currencyCode)  // Fetching data from BOI to MySQL
 {
-    dataExists($currencyCode);
+    checkIfTableExists($currencyCode);
     $url = "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_{$currencyCode}_ILS?startperiod=2023-01-01&endperiod=2024-01-01";
     $xmlData = file_get_contents($url);
 
@@ -54,7 +54,7 @@ function updateData($currency, $data)
             if ($conn->query($sql) !== TRUE) {
                 die("Error: " . $conn->error);
             }
-        } elseif ((count($currentData) < count($formattedDatas['values']))) {
+        } elseif ((count($currentData) < count($formattedDatas['values']))) { //checks if current data needs update
             updateExchangeRates($conn, $formattedDatas['values'],  $formattedDatas['dates'], $currency);
         }
     } catch (Exception $error) {
@@ -90,7 +90,7 @@ function createTable($currencyCode)
     $conn->query($createTableQuery);
 }
 
-function dataExists($currencyCode) // Checks if there is data already
+function checkIfTableExists($currencyCode)
 {
     global $conn;
     $tableName = "exchange_rates_$currencyCode";
@@ -98,18 +98,10 @@ function dataExists($currencyCode) // Checks if there is data already
     // Check if the table exists
     $checkTableQuery = "SHOW TABLES LIKE '$tableName'";
     $result = $conn->query($checkTableQuery);
-    if ($result->num_rows == 0) {
+    if ($result->num_rows == 0) { // Creates if not
         createTable($currencyCode);
         return false;
     }
-
-    // Checks if the table has data
-    $checkDataQuery = "SELECT COUNT(*) AS count FROM $tableName";
-    $result = $conn->query($checkDataQuery);
-    $row = $result->fetch_assoc();
-    $count = $row['count'];
-
-    return $count > 0;
 }
 
 // Making the fetch for each currency
@@ -124,7 +116,7 @@ function updateExchangeRates($conn, $rates, $dates, $currency)
     $tableName = "exchange_rates_" . $currency;
     $existingRecords = [];
 
-    // Retrieve existing records for provided dates
+    // Get existing records for dates
     foreach ($dates as $date) {
         $existingRecord = getExchangeRateByDate($conn, $tableName, $date);
         $existingRecords[$date] = $existingRecord;
