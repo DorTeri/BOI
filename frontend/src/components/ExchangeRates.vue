@@ -13,7 +13,7 @@
           <CurrencyDisplay
             @click="handleClick(currency)"
             :title="currency"
-            :value="getObsValue(currency)"
+            :value="getValue(currency)"
             :diff="getDiff(currency)"
           />
         </div>
@@ -55,20 +55,18 @@ export default {
             `http://localhost/bank/backend/api/get.php?currency=${currency}&start_date=2023-01-01&end_date=2024-01-01`
           )
           .then((response) => {
-            if (typeof response.data === "object") {
+            console.log('test', response.data)
               this.currencyData[currency] = response.data;
-            }
           })
           .catch((error) => {
             console.error(`Error fetching ${currency} data:`, error);
           });
       });
     },
-    getObsValue(currency) {
+    getValue(currency) {
       const currencyData = this.currencyData[currency];
-      console.log("currencyData", currencyData);
       if (currencyData && currencyData.length > 0) {
-        return +currencyData[currencyData.length - 1].obsValue;
+        return +currencyData[currencyData.length - 1].exchange_rate;
       }
       return null;
     },
@@ -76,8 +74,8 @@ export default {
       const currencyData = this.currencyData[currency];
       if (currencyData && currencyData.length > 1) {
         const length = currencyData.length;
-        const value1 = currencyData[length - 1].obsValue;
-        const value2 = currencyData[length - 2].obsValue;
+        const value1 = currencyData[length - 1].exchange_rate;
+        const value2 = currencyData[length - 2].exchange_rate;
         const diff = value1 - value2;
         const percentageDiff = (diff / value2) * 100;
         const fixed = percentageDiff.toFixed(2);

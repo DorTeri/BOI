@@ -78,8 +78,8 @@ export default {
         )
         .then((response) => {
           response.data.forEach((data) => {
-            this.series[0].data.push(data.obsValue);
-            this.options.xaxis.categories.push(data.timePeriod);
+            this.series[0].data.push(data.exchange_rate);
+            this.options.xaxis.categories.push(data.date_time);
           });
           this.alert();
         })

@@ -1,39 +1,50 @@
 <?php
-require_once('../config/database.php'); // Database configuration
-
+require_once(__DIR__ . '/../config/database.php');
 header("Access-Control-Allow-Origin: http://localhost:8080");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
 // Handle API requests
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['currency']) && isset($_GET['start_date']) && isset($_GET['end_date'])) {
-    $currency = $_GET['currency'];
-    $startDate = $_GET['start_date'] ?? '2023-01-01';
-    $endDate = $_GET['end_date'] ?? '2024-01-01';
+function handleGet($currency = null)
+{
 
-
-    // Query database
-    $tableName = "rates_$currency";
-    $query = "SELECT rates FROM $tableName";
-    $statement = $conn->prepare($query);
-    $statement->execute();
-    $result = $statement->get_result();
-
-    // Fetch the data
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $rates = unserialize($row['rates']);
-        foreach ($rates as $rate) {
-            if ($rate->timePeriod >= $startDate && $rate->timePeriod <= $endDate) {
-                $data[] = $rate;
-            }
-        }
+    global $conn;
+    if ($currency === null && isset($_GET['currency'])) {
+        $currency = $_GET['currency'];
     }
 
-    $statement->close();
+    if ($currency !== null) {
+        $startDate = $_GET['start_date'] ?? '2023-01-01';
+        $endDate = $_GET['end_date'] ?? '2024-01-01';
 
-    header('Content-Type: application/json');
-    echo json_encode($data);
-} else {
-    http_response_code(400);
-    echo json_encode(array("message" => "Invalid request"));
+        // Query database
+        $tableName = "exchange_rates_" . $currency;
+        $query = "SELECT * FROM $tableName WHERE date_time BETWEEN ? AND ?";
+        $statement = $conn->prepare($query);
+
+        // Bind parameters and execute query
+        $statement->bind_param("ss", $startDate, $endDate);
+        $statement->execute();
+
+        // Get results
+        $result = $statement->get_result();
+
+        // Fetch data as associative array
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $statement->close();
+
+        // Set response headers and output data as JSON
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        return json_encode($data);
+    } else {
+        // Invalid request
+        http_response_code(400);
+        return json_encode(array("message" => "Invalid request"));
+    }
 }
+
+handleGet();
